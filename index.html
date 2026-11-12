@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Veinticuatro — Un regalo que se abre cada día</title>
+<meta name="description" content="Crea una cuenta atrás con un mensaje para cada día. Para tu pareja, tu amiga o tu familia. La mandas por WhatsApp en 2 minutos.">
+<meta property="og:title" content="Tienes un regalo que se abre cada día">
+<meta property="og:description" content="Alguien te ha preparado una cuenta atrás con un mensaje para cada día.">
+<script>
+/* ============ CONFIGURACIÓN (lo único que tienes que tocar) ============
+   1. Crea un "Payment Link" en Stripe de 4,99 €.
+   2. En "Después del pago" elige "Redirigir a tu web" y pon:
+        https://TU-DOMINIO/?pagado=v-9xk3pd
+   3. Pega aquí el enlace de Stripe y rellena tus datos legales. */
+const CONFIG = {
+  pay: '',                       // enlace de Stripe
+  price: '4,99 €',
+  tok: 'v-9xk3pd',
+  titular: '[TU NOMBRE O EMPRESA]',
+  nif: '[TU NIF]',
+  domicilio: '[TU DOMICILIO]',
+  contacto: '[TU EMAIL]'
+};
+</script>
+<style>
+:root{--bg:#fff;--ink:#0B0B0F;--mute:#6D6D78;--fill:#F3F3F5;--line:#E6E6EA;--ok:#0A8F5B;--bad:#C9361F}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+/* ---------- editor ---------- */
+.wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.logo{font-weight:800;font-size:19px;letter-spacing:-.03em;display:flex;align-items:center;gap:9px}
+.logo b{width:32px;height:32px;border-radius:10px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:14px}
+.logo{flex:none}.tag{font-size:12px;font-weight:600;color:var(--mute);text-align:right;margin-left:12px}
+h1{font-size:clamp(38px,7.4vw,72px);line-height:1;letter-spacing:-.05em;font-weight:800;margin:28px 0 16px;max-width:820px}
+h1 span{color:var(--mute)}
+.sub{font-size:clamp(17px,2.2vw,20px);color:var(--mute);max-width:560px;margin:0 0 34px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:40px;align-items:start}
+@media(min-width:920px){.grid{grid-template-columns:minmax(0,1fr) 360px;gap:64px}.side{position:sticky;top:20px}}
+h2{font-size:24px;letter-spacing:-.03em;margin:0 0 4px;font-weight:800}
+.step{padding:26px 0;border-top:1px solid var(--line)}
+.step>p{margin:0 0 16px;color:var(--mute);font-size:15px}
+label{display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin:16px 0 7px}
+label small{font-weight:500;color:var(--mute)}
+input[type=text],input[type=date],input[type=url],textarea{width:100%;border:1.5px solid transparent;background:var(--fill);border-radius:12px;padding:13px 14px;outline:0;min-width:0}
+textarea{resize:vertical;min-height:54px;display:block}
+input:focus,textarea:focus{border-color:var(--ink);background:#fff}
+::placeholder{color:#A3A3AD}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pills button{border:0;background:var(--fill);border-radius:99px;padding:11px 18px;font-weight:700;font-size:15px;cursor:pointer}
+.pills button.on{background:var(--ink);color:#fff}
+.themes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.themes button{border:2.5px solid transparent;border-radius:16px;padding:14px 12px;cursor:pointer;text-align:left;font-weight:700;font-size:14px;height:92px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+.themes button i{font-style:normal;font-size:24px;line-height:1}
+.themes button.on{outline:2.5px solid var(--ink);outline-offset:2px}
+.themes button.on:after{content:"✓";position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;display:grid;place-items:center}
+.door{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.door .n{width:44px;height:44px;border-radius:12px;background:var(--ink);color:#fff;font-weight:800;display:grid;place-items:center}
+.door .top{display:grid;grid-template-columns:54px minmax(0,1fr);gap:8px}
+.door .em{text-align:center;padding:13px 4px;font-size:20px}
+.door .meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px;color:var(--mute)}
+.door .meta button{border:0;background:none;padding:0;font-weight:600;font-size:13px;color:var(--ink);text-decoration:underline;cursor:pointer}
+.door input[type=url]{margin-top:8px;font-size:14px;padding:10px 12px}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;border:0;border-radius:14px;padding:17px;font-weight:700;font-size:17px;cursor:pointer;text-decoration:none}
+.btn.dark{background:var(--ink);color:#fff}
+.btn.light{background:var(--fill);color:var(--ink);margin-top:10px}
+.btn:active{transform:scale(.985)}
+.consent{display:flex;gap:10px;font-size:13px;color:var(--mute);margin:14px 0;line-height:1.4;font-weight:400;justify-content:flex-start}
+.consent input{width:18px;height:18px;flex:none;margin-top:1px;accent-color:#0B0B0F}
+.consent a,.foot a{color:var(--ink)}
+.phone{border-radius:38px;border:9px solid var(--ink);overflow:hidden;height:600px;position:relative;background:#000}
+.phone .view{height:100%;overflow:auto;min-height:0;position:static}
+.cap{text-align:center;font-size:13px;color:var(--mute);margin:10px 0 18px}
+.result{background:var(--fill);border-radius:18px;padding:18px;margin-top:8px}
+.result h3{margin:0 0 4px;font-size:19px;letter-spacing:-.02em}
+.result p{margin:0 0 12px;color:var(--mute);font-size:14px}
+.result input{background:#fff;font-size:14px;margin-bottom:10px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:26px;padding:50px 0 10px;border-top:1px solid var(--line);margin-top:40px}
+.how b{display:block;font-size:34px;font-weight:800;letter-spacing:-.04em;color:#C9C9D1}
+.how h4{margin:6px 0 4px;font-size:18px;letter-spacing:-.02em}
+.how p{margin:0;color:var(--mute);font-size:15px}
+.foot{padding:30px 0 44px;font-size:13px;color:var(--mute);border-top:1px solid var(--line);margin-top:44px}
+.foot button{border:0;background:none;padding:0;text-decoration:underline;cursor:pointer;color:var(--ink);font-size:13px;margin-right:14px}
+@media(max-width:919px){body.ed{padding-bottom:96px}.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:12px 20px calc(12px + env(safe-area-inset-bottom));z-index:5}}
+@media(min-width:920px){.bar{display:none}}
+dialog{border:0;border-radius:20px;padding:26px;max-width:560px;width:calc(100% - 32px);max-height:84vh}
+dialog::backdrop{background:rgba(11,11,15,.5)}
+dialog h3{margin:18px 0 6px;font-size:17px}dialog h3:first-of-type{margin-top:0}
+dialog p{margin:0 0 8px;font-size:14px;color:#3d3d45}
+.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-90px);background:var(--ink);color:#fff;padding:13px 18px;border-radius:14px;font-weight:600;font-size:14px;transition:transform .3s;z-index:60;max-width:92vw;text-align:center}
+.toast.on{transform:translate(-50%,0)}
+/* ---------- calendario (lo que ve quien lo recibe) ---------- */
+.view{--c-bg:#141033;--c-bg2:#2A1F6B;--c-tile:rgba(255,255,255,.08);--c-line:rgba(255,255,255,.16);--c-ink:#fff;--c-mute:rgba(255,255,255,.62);--c-hot:#fff;--c-hotink:#141033;--c-acc:#FFC94D;
+  background:linear-gradient(170deg,var(--c-bg2),var(--c-bg) 55%);color:var(--c-ink);min-height:100vh;min-height:100dvh;position:relative;padding:28px 16px 40px}
+.view.t-coral{--c-bg:#FFE7DF;--c-bg2:#FFD0C2;--c-tile:rgba(255,255,255,.6);--c-line:rgba(120,30,20,.12);--c-ink:#3A0F0A;--c-mute:rgba(58,15,10,.6);--c-hot:#E8452C;--c-hotink:#fff;--c-acc:#E8452C}
+.view.t-pino{--c-bg:#0C2B22;--c-bg2:#17513F;--c-tile:rgba(255,255,255,.07);--c-line:rgba(255,255,255,.15);--c-ink:#F4EFE1;--c-mute:rgba(244,239,225,.62);--c-hot:#F4EFE1;--c-hotink:#0C2B22;--c-acc:#F3B95F}
+.cal{max-width:460px;margin:0 auto}
+.cal .hi{font-size:14px;font-weight:600;color:var(--c-mute);margin:0 0 6px}
+.cal h1{font-size:34px;line-height:1.05;letter-spacing:-.04em;margin:0 0 8px;color:var(--c-ink);max-width:none}
+.cal .st{font-size:15px;color:var(--c-mute);margin:0 0 20px}
+.cal .st b{color:var(--c-acc)}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.tile{border:1px solid var(--c-line);background:var(--c-tile);border-radius:18px;aspect-ratio:1/1.12;padding:12px 10px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;color:var(--c-ink);cursor:pointer;position:relative;min-width:0;font-family:inherit}
+.tile small{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--c-mute);text-transform:uppercase}
+.tile strong{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.tile em{font-style:normal;font-size:13px;width:28px;height:28px;border-radius:50%;background:var(--c-line);display:grid;place-items:center}
+.tile.w2{grid-column:span 2;aspect-ratio:auto}
+.tile.w3{grid-column:span 3;aspect-ratio:auto;flex-direction:row;justify-content:space-between;padding:18px;min-height:104px;text-align:left}
+.tile.w3 div{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.tile.w3 p{margin:0;font-size:13px;color:var(--c-mute);font-weight:500}
+.tile.w3 .gift{font-size:46px;line-height:1}
+.tile.lock{opacity:.78}
+.tile.done strong{font-size:30px}
+.tile.done em{background:none;font-size:20px}
+.tile.hot{background:var(--c-hot);color:var(--c-hotink);border-color:transparent;animation:pulse 2s infinite}
+.tile.hot small,.tile.hot p{color:inherit;opacity:.65}
+.tile.hot em{width:auto;height:auto;border-radius:99px;padding:6px 12px;background:var(--c-hotink);color:var(--c-hot);font-weight:700;font-size:12px}
+@keyframes pulse{50%{transform:scale(1.025)}}
+.tile.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.made{display:block;text-align:center;margin:26px auto 0;font-size:13px;font-weight:600;color:var(--c-mute);text-decoration:none}
+.made u{color:var(--c-ink)}
+.pop{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:end center;z-index:40;padding:12px}
+.phone .pop{position:absolute}
+.sheet{background:#fff;color:#0B0B0F;border-radius:28px;padding:30px 24px 22px;width:100%;max-width:440px;text-align:center;animation:up .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes up{from{transform:translateY(60px) scale(.96);opacity:0}}
+.sheet .e{font-size:64px;line-height:1;margin-bottom:10px;animation:pop .5s .1s both}
+@keyframes pop{from{transform:scale(0) rotate(-30deg)}}
+.sheet small{font-weight:700;letter-spacing:.08em;font-size:11px;color:#6D6D78;text-transform:uppercase}
+.sheet p{font-size:21px;line-height:1.3;letter-spacing:-.02em;font-weight:600;margin:10px 0 20px;white-space:pre-wrap;overflow-wrap:anywhere}
+.sheet .btn{margin-top:8px}
+.conf{position:absolute;top:40%;left:50%;font-size:22px;pointer-events:none;animation:fly 1s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- ======================= EDITOR ======================= -->
+<div id="editor" hidden>
+<div class="wrap">
+  <header><div class="logo"><b>24</b>veinticuatro</div><span class="tag" id="tag"></span></header>
+  <h1>Un regalo que se abre <span>cada día.</span></h1>
+  <p class="sub">Escribe un mensaje para cada día. La otra persona abre uno al día desde su móvil. Lo mandas por WhatsApp y está listo en 2 minutos.</p>
+
+  <div class="grid">
+    <div>
+      <div class="step">
+        <h2>¿Para quién es?</h2>
+        <div class="row">
+          <div><label for="to">Para <small id="cTo"></small></label><input id="to" type="text" maxlength="24" placeholder="Lucía"></div>
+          <div><label for="from">De parte de <small id="cFrom"></small></label><input id="from" type="text" maxlength="24" placeholder="Dani"></div>
+        </div>
+        <label>Empieza con ideas hechas</label>
+        <div class="pills" id="tpl"></div>
+      </div>
+
+      <div class="step">
+        <h2>¿Cuánto dura?</h2>
+        <label>Días</label>
+        <div class="pills" id="days"></div>
+        <label for="start">Primer día <small id="endTxt"></small></label>
+        <input id="start" type="date">
+        <label>Diseño</label>
+        <div class="themes" id="themes"></div>
+      </div>
+
+      <div class="step">
+        <h2>Los mensajes</h2>
+        <p>Ya tienes ideas escritas. Cambia las que quieras. Puedes poner un enlace a una canción, una foto o un vídeo.</p>
+        <div id="doors"></div>
+      </div>
+
+      <div class="step" id="buy">
+        <h2 id="buyT">Crea el enlace</h2>
+        <p id="buyP"></p>
+        <div id="payBox">
+          <label class="consent"><input type="checkbox" id="ok"><span>Acepto las <a href="#" data-legal>condiciones</a>. Pido que el contenido digital se entregue ahora mismo y sé que por eso pierdo el derecho de desistimiento de 14 días.</span></label>
+          <button class="btn dark" id="pay"></button>
+          <button class="btn light" id="free">Probar gratis con 3 días</button>
+        </div>
+        <div class="result" id="result" hidden>
+          <h3 id="resT"></h3>
+          <p id="resP"></p>
+          <input id="link" type="text" readonly>
+          <button class="btn dark" id="copy">Copiar enlace</button>
+          <a class="btn light" id="wa" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+          <a class="btn light" id="open" target="_blank" rel="noopener">Ver cómo queda</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="phone"><div class="view" id="prev"></div></div>
+      <p class="cap">Así lo ve en su móvil. Aquí puedes abrir todos los días.</p>
+    </div>
+  </div>
+
+  <div class="how">
+    <div><b>1</b><h4>Escribes</h4><p>Un mensaje, un plan o un vale para cada día. Te damos las ideas.</p></div>
+    <div><b>2</b><h4>Envías un enlace</h4><p>Por WhatsApp o como quieras. No hace falta instalar nada.</p></div>
+    <div><b>3</b><h4>Abre uno al día</h4><p>Cada día se desbloquea un mensaje nuevo. Los demás esperan.</p></div>
+  </div>
+
+  <div class="foot">
+    <button data-legal>Aviso legal</button><button data-legal>Condiciones</button><button data-legal>Privacidad</button>
+    <p>No guardamos tus mensajes. Viajan dentro del enlace. Esta web no usa cookies de seguimiento.</p>
+  </div>
+</div>
+<div class="bar"><button class="btn dark" id="barBtn">Crear el enlace</button></div>
+</div>
+
+<!-- ======================= VISTA DE QUIEN RECIBE ======================= -->
+<div class="view" id="viewer" hidden></div>
+
+<dialog id="legal">
+  <h3>Aviso legal</h3>
+  <p>Titular de esta web: <span data-c="titular"></span>. NIF: <span data-c="nif"></span>. Domicilio: <span data-c="domicilio"></span>. Contacto: <span data-c="contacto"></span>.</p>
+  <h3>Condiciones de compra</h3>
+  <p>Vendemos un contenido digital: un enlace que muestra una cuenta atrás con los mensajes que tú escribes. El precio es <span data-c="price"></span>, con impuestos incluidos. Es un pago único. No hay suscripción.</p>
+  <p>El pago lo gestiona Stripe. Al terminar el pago, tu navegador crea el enlace al momento.</p>
+  <p>Derecho de desistimiento: en un contenido digital que se entrega al momento, pierdes el derecho de desistimiento de 14 días cuando pides la entrega inmediata y lo aceptas antes de pagar (artículo 103.m de la Ley General para la Defensa de los Consumidores y Usuarios). Si algo falla, escríbenos a <span data-c="contacto"></span> y lo arreglamos o te devolvemos el dinero.</p>
+  <p>Tú eres responsable del texto y de los enlaces que escribes. No uses el servicio para acosar ni para enviar contenido ilegal.</p>
+  <h3>Privacidad</h3>
+  <p>No tenemos servidor ni base de datos para tus mensajes. Los nombres y los mensajes se guardan dentro del propio enlace y, como borrador, en tu navegador. Quien tenga el enlace puede leerlos.</p>
+  <p>Stripe trata tus datos de pago como responsable de ese pago. No usamos cookies de seguimiento ni publicidad. Puedes escribir a <span data-c="contacto"></span> para cualquier duda sobre tus datos.</p>
+  <form method="dialog"><button class="btn dark" style="margin-top:14px">Cerrar</button></form>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const LS={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),3600)}
+const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
+const pDate=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const fDate=d=>d.toLocaleDateString('es-ES',{day:'numeric',month:'long'});
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+
+/* ---------- ideas ---------- */
+const TPL={
+ pareja:{n:'Pareja',d:[['💌','Empieza la cuenta atrás. Cada día, algo pequeño para ti.'],['☕','Vale por un desayuno en la cama. Tú eliges el día.'],['🎵','Esta canción me recuerda a ti. Dale al botón.'],['📸','Mi foto favorita de los dos es la de…'],['💆','Vale por un masaje de 20 minutos. Sin excusas.'],['😂','¿Te acuerdas de cuando…? Todavía me río.'],['🍝','Hoy cocino yo. Tú solo siéntate.'],['🌟','Tres cosas que me gustan de ti: 1… 2… 3…'],['🎬','Noche de peli. Eliges tú y no protesto.'],['🚶','Vale por un paseo largo sin móvil.'],['🍫','Mira en el cajón de… Hay algo para ti.'],['🗺️','El viaje que quiero hacer contigo es…'],['🧹','Hoy hago yo tu tarea menos favorita.'],['💬','Lo primero que pensé cuando te conocí fue…'],['🍷','Vale por una cena fuera. Invito yo.'],['🛁','Tarde libre para ti. Yo me encargo de todo.'],['🎁','Una pista de tu regalo: …'],['🤗','Vale por un abrazo de un minuto entero.'],['📝','Lo que más me gustó de este año contigo fue…'],['🎲','Noche de juegos. Quien pierde friega.'],['🌅','Vamos a ver el atardecer en…'],['💃','Vale por un baile en el salón.'],['🔮','El año que viene quiero que hagamos…'],['❤️','Último día. Gracias por este año. Te quiero.']]},
+ amistad:{n:'Amistad',d:[['👋','Empieza tu cuenta atrás. Un mensaje mío cada día.'],['☕','Vale por un café largo. Invito yo.'],['😂','El día que más me reí contigo fue…'],['🎵','Nuestra canción. Dale al botón y súbela.'],['📸','Busca nuestra foto más ridícula y mándamela.'],['🍕','Vale por una cena de pizza y cotilleos.'],['🌟','Lo que más admiro de ti es…'],['🎬','Peli pendiente: la vemos esta semana.'],['🛍️','Vale por una tarde de tiendas sin prisa.'],['📞','Hoy te llamo. Coge el teléfono.'],['🍻','Vale por unas cañas. Tú pones el día.'],['🤫','Un secreto: nunca te dije que…'],['🚗','Excursión de un día. El destino lo elijo yo.'],['💪','Recuerda esto: este año conseguiste…'],['🍰','Vale por una merienda con tarta.'],['📚','Te recomiendo este libro o esta serie: …'],['🎤','Vale por una noche de karaoke.'],['🧩','Plan tranquilo: sofá, manta y hablar.'],['🙏','Gracias por estar aquel día que…'],['🎁','Pista de tu regalo: …'],['🌄','Propósito juntas para el año que viene: …'],['🥂','Vale por un brindis. Yo llevo la botella.'],['💬','Si tuviera que describirte en tres palabras: …'],['🫶','Último día. Qué suerte tenerte.']]},
+ familia:{n:'Familia',d:[['🏠','Empieza la cuenta atrás. Algo para ti cada día.'],['☕','Vale por un desayuno juntos sin prisa.'],['📸','Mi recuerdo favorito contigo es…'],['🍲','Hoy cocino yo tu plato favorito.'],['📞','Hoy te llamo y hablamos un buen rato.'],['🌟','Algo que aprendí de ti: …'],['🎬','Tarde de peli. Eliges tú.'],['🚶','Vale por un paseo los dos.'],['🧹','Hoy hago yo esa tarea que no te gusta.'],['😂','Todavía me río cuando me acuerdo de…'],['🍰','Vale por una merienda con algo dulce.'],['📖','Cuéntame otra vez la historia de…'],['🎲','Tarde de juegos de mesa.'],['💬','Gracias por aquella vez que…'],['🛍️','Vale por una mañana de recados juntos.'],['🎵','Esta canción me recuerda a ti.'],['🧺','Plan de domingo: comida todos juntos.'],['🤗','Vale por un abrazo largo.'],['🌱','Lo que más valoro de nuestra familia es…'],['🎁','Pista de tu regalo: …'],['📷','Hoy nos hacemos una foto juntos.'],['🍽️','Vale por una comida fuera. Invito yo.'],['🔮','El año que viene quiero que hagamos…'],['❤️','Último día. Gracias por todo. Te quiero.']]},
+ blanco:{n:'En blanco',d:[]}
+};
+const THEMES={noche:['Noche','🌙','#2A1F6B','#fff'],coral:['Coral','🍓','#FFD0C2','#3A0F0A'],pino:['Pino','🌲','#17513F','#F4EFE1']};
+function fromTpl(k,n){const src=TPL[k].d;return Array.from({length:n},(_,i)=>{const s=src.length?(i===n-1?src[src.length-1]:src[i]):['🎁',''];return{e:s[0],t:s[1],u:''}})}
+
+/* ---------- enlace: los datos viajan dentro ---------- */
+const b64=u8=>{let s='';for(let i=0;i<u8.length;i+=8192)s+=String.fromCharCode(...u8.subarray(i,i+8192));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+const unb64=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+async function pipe(u8,stream){const r=new Blob([u8]).stream().pipeThrough(stream);return new Uint8Array(await new Response(r).arrayBuffer())}
+async function enc(o){const u8=new TextEncoder().encode(JSON.stringify(o));if(self.CompressionStream){try{return'z'+b64(await pipe(u8,new CompressionStream('deflate-raw')))}catch(e){}}return'j'+b64(u8)}
+async function dec(s){let u8=unb64(s.slice(1));if(s[0]==='z')u8=await pipe(u8,new DecompressionStream('deflate-raw'));return JSON.parse(new TextDecoder().decode(u8))}
+const pack=(D,n)=>({v:1,t:D.to.trim(),f:D.from.trim(),s:D.start,h:D.th,d:D.doors.slice(0,n).map(x=>x.u?[x.e,x.t,x.u]:[x.e,x.t])});
+function clean(o){ // el enlace puede venir de cualquiera: se valida todo
+  const str=(x,m)=>typeof x==='string'?x.slice(0,m):'';
+  const d=(Array.isArray(o.d)?o.d:[]).slice(0,31).map(x=>({e:str(x[0],8)||'🎁',t:str(x[1],400),u:/^https?:\/\//i.test(x[2]||'')?str(x[2],600):''}));
+  return{to:str(o.t,40),from:str(o.f,40),start:/^\d{4}-\d\d-\d\d$/.test(o.s)?o.s:iso(today()),th:THEMES[o.h]?o.h:'noche',doors:d};
+}
+
+/* ---------- calendario ---------- */
+function renderCal(root,D,opt={}){
+  const n=D.doors.length,start=pDate(D.start),now=today(),idx=Math.round((now-start)/864e5),key='v24_'+D.start+'_'+n+'_'+D.to;
+  const opened=opt.preview?[]:(LS.get(key)||[]);
+  root.className='view t-'+D.th;root.innerHTML='';
+  const cal=el('div','cal');root.appendChild(cal);
+  cal.appendChild(el('p','hi',D.from?`De parte de ${D.from}`:'Un regalo para ti'));
+  cal.appendChild(el('h1',null,D.to?`${D.to}, esto es para ti.`:'Esto es para ti.'));
+  const st=el('p','st');
+  if(idx<0){st.append('Empieza el ',el('b',null,fDate(start)),`. ${-idx===1?'Falta 1 día':'Faltan '+(-idx)+' días'}.`)}
+  else if(idx<n){st.append('Hoy se abre el ',el('b',null,'día '+(idx+1)),'. Vuelve mañana a por el siguiente.')}
+  else st.append('Ya puedes abrir ',el('b',null,'todos los días'),'.');
+  if(opt.preview){st.textContent='';st.append(el('b',null,'Vista previa.'),' Toca cualquier día para abrirlo.')}
+  cal.appendChild(st);
+  const tiles=el('div','tiles');cal.appendChild(tiles);
+  D.doors.forEach((d,i)=>{
+    const can=opt.preview||i<=idx,done=opened.includes(i),hot=!opt.preview&&i===idx&&!done,last=i===n-1&&n>1;
+    const t=el('button','tile'+(last?' w3':i===0&&n!==7&&n>2?' w2':'')+(can?'':' lock')+(done?' done':'')+(hot?' hot':''));
+    const lab=el('small',null,'Día '+(i+1)),big=el('strong',null,String(i+1)),ic=el('em',null,done?d.e:hot?'Abrir':can?'✨':'🔒');
+    if(last){const box=el('div');box.append(lab,big,el('p',null,can?'El último. Ábrelo.':'El último es especial. Se abre el '+fDate(addD(start,i))+'.'));t.append(box,el('span','gift',done?d.e:'🎁'))}
+    else t.append(lab,big,ic);
+    t.onclick=()=>{
+      if(!can){t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake');return toast('Todavía no. Se abre el '+fDate(addD(start,i))+'.')}
+      if(!opt.preview&&!opened.includes(i)){opened.push(i);LS.set(key,opened)}
+      openDoor(root,d,i,()=>{if(!opt.preview)renderCal(root,D,opt)});
+    };
+    tiles.appendChild(t);
+  });
+  if(!opt.preview){const a=el('a','made');a.href=location.pathname;a.append('¿Te ha gustado? ',el('u',null,'Haz uno para alguien'));cal.appendChild(a)}
+}
+function openDoor(root,d,i,onClose){
+  const pop=el('div','pop'),sh=el('div','sheet');pop.appendChild(sh);
+  sh.append(el('div','e',d.e),el('small',null,'Día '+(i+1)),el('p',null,d.t||'…'));
+  if(d.u){const a=el('a','btn dark','Abrir enlace');a.href=d.u;a.target='_blank';a.rel='noopener noreferrer';sh.appendChild(a)}
+  const c=el('button','btn light','Cerrar');sh.appendChild(c);
+  const close=()=>{pop.remove();onClose&&onClose()};c.onclick=close;pop.onclick=e=>{if(e.target===pop)close()};
+  for(let k=0;k<14;k++){const s=el('span','conf',['✨','🎉',d.e,'💛'][k%4]);s.style.setProperty('--x',(Math.random()*360-180)+'px');s.style.setProperty('--y',(-Math.random()*320-60)+'px');s.style.setProperty('--r',(Math.random()*360)+'deg');s.style.animationDelay=(k*25)+'ms';pop.appendChild(s);setTimeout(()=>s.remove(),1400)}
+  root.appendChild(pop);
+}
+
+/* ---------- editor ---------- */
+let D,dirty=false;
+const paid=()=>{const u=LS.get('v24_paid');return u&&u>Date.now()};
+function defStart(){const t=today(),d=new Date(t.getFullYear(),11,1);return iso(t<=d?d:t)}
+function saveDraft(){LS.set('v24_draft',D)}
+function preview(){renderCal($('#prev'),D,{preview:true});saveDraft()}
+function pills(box,items,cur,fn){box.innerHTML='';items.forEach(([k,txt])=>{const b=el('button',k===cur?'on':'',txt);b.type='button';b.onclick=()=>fn(k);box.appendChild(b)})}
+function drawControls(){
+  pills($('#tpl'),Object.entries(TPL).map(([k,v])=>[k,v.n]),D.tpl,k=>{
+    if(dirty&&!confirm('Vas a cambiar todos los mensajes por las ideas nuevas. ¿Seguro?'))return;
+    D.tpl=k;D.doors=fromTpl(k,D.n);dirty=false;drawControls();drawDoors();preview()});
+  pills($('#days'),[[7,'7 días'],[12,'12 días'],[24,'24 días']],D.n,k=>{
+    const base=fromTpl(D.tpl,k);D.doors=base.map((b,i)=>D.doors[i]&&dirty&&i<k-1?D.doors[i]:b);D.n=k;drawControls();drawDoors();preview()});
+  const th=$('#themes');th.innerHTML='';Object.entries(THEMES).forEach(([k,[name,ic,bg,fg]])=>{const b=el('button',k===D.th?'on':'');b.type='button';b.style.background=bg;b.style.color=fg;b.append(el('i',null,ic),name);b.onclick=()=>{D.th=k;drawControls();preview()};th.appendChild(b)});
+  $('#endTxt').textContent='Último día: '+fDate(addD(pDate(D.start),D.n-1));
+  const p=paid();
+  $('#pay').textContent=p?'Crear mi enlace':`Crear el enlace de ${D.n} días · ${CONFIG.price}`;
+  $('#buyP').textContent=p?'Pago recibido. Revisa los mensajes y crea tu enlace.':`Un pago de ${CONFIG.price}. Sin cuenta y sin suscripción. El enlace funciona en cualquier móvil.`;
+  $('#ok').closest('label').hidden=p;$('#free').hidden=p;
+  $('#barBtn').textContent=p?'Crear mi enlace':`Crear el enlace · ${CONFIG.price}`;
+}
+function drawDoors(){
+  const box=$('#doors');box.innerHTML='';
+  D.doors.forEach((d,i)=>{
+    const r=el('div','door'),body=el('div'),top=el('div','top');
+    const em=el('input','em');em.type='text';em.maxLength=4;em.value=d.e;em.setAttribute('aria-label','Emoji del día '+(i+1));
+    const tx=el('textarea');tx.maxLength=220;tx.rows=2;tx.value=d.t;tx.placeholder='Escribe el mensaje del día '+(i+1);
+    const meta=el('div','meta'),cnt=el('span',null,fDate(addD(pDate(D.start),i))+' · '+d.t.length+'/220'),lk=el('button',null,d.u?'Quitar enlace':'+ Añadir enlace');lk.type='button';
+    const url=el('input');url.type='url';url.placeholder='https://… (canción, foto o vídeo)';url.value=d.u;url.hidden=!d.u;
+    em.oninput=()=>{d.e=em.value;dirty=true;preview()};
+    tx.oninput=()=>{d.t=tx.value;dirty=true;cnt.textContent=fDate(addD(pDate(D.start),i))+' · '+d.t.length+'/220';preview()};
+    url.oninput=()=>{d.u=url.value.trim();dirty=true;saveDraft()};
+    lk.onclick=()=>{if(url.hidden){url.hidden=false;lk.textContent='Quitar enlace';url.focus()}else{url.hidden=true;url.value='';d.u='';lk.textContent='+ Añadir enlace';saveDraft()}};
+    top.append(em,tx);meta.append(cnt,lk);body.append(top,meta,url);r.append(el('div','n',String(i+1)),body);box.appendChild(r);
+  });
+}
+function validate(){
+  if(!D.to.trim()){toast('Escribe para quién es');$('#to').focus();return false}
+  const bad=D.doors.findIndex(d=>d.u&&!/^https?:\/\/\S+\.\S+/i.test(d.u));
+  if(bad>=0){toast(`El enlace del día ${bad+1} no es válido. Tiene que empezar por https://`);return false}
+  return true;
+}
+async function makeLink(n,isFree){
+  const url=location.origin+location.pathname+'#c='+await enc(pack(D,n));
+  $('#result').hidden=false;$('#link').value=url;$('#open').href=url;
+  $('#resT').textContent=isFree?'Tu prueba de 3 días':'Tu enlace está listo';
+  $('#resP').textContent=isFree?'Este enlace solo tiene los 3 primeros días. Sirve para ver cómo funciona.':'Mándaselo cuando quieras. El primer día se abre el '+fDate(pDate(D.start))+'.';
+  $('#wa').href='https://wa.me/?text='+encodeURIComponent(`Tengo algo para ti${D.to?', '+D.to.trim():''}. Se abre un poco cada día 🎁\n${url}`);
+  $('#result').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function initEditor(){
+  document.body.classList.add('ed');$('#editor').hidden=false;
+  const q=new URLSearchParams(location.search).get('pagado');let thanks=false;
+  if(q===CONFIG.tok){LS.set('v24_paid',Date.now()+864e5);thanks=true}
+  if(q)history.replaceState(null,'',location.pathname);
+  const s=LS.get('v24_draft');
+  D=s&&Array.isArray(s.doors)&&s.doors.length?s:{to:'',from:'',tpl:'pareja',n:24,start:defStart(),th:'noche',doors:fromTpl('pareja',24)};
+  dirty=!!s;
+  const dl=Math.ceil((new Date(today().getFullYear(),11,1)-today())/864e5);$('#tag').textContent=dl>0?`Faltan ${dl} días para el 1 de diciembre`:'Pago único · Sin cuenta';
+  [['to','#cTo'],['from','#cFrom']].forEach(([k,c])=>{const i=$('#'+k);i.value=D[k];const up=()=>$(c).textContent=i.value.length+'/24';up();i.oninput=()=>{D[k]=i.value;up();preview()}});
+  const sd=$('#start');sd.value=D.start;sd.onchange=()=>{if(!sd.value)return;D.start=sd.value;drawControls();drawDoors();preview()};
+  drawControls();drawDoors();preview();
+  $('#pay').onclick=()=>{
+    if(!validate())return;
+    if(paid())return makeLink(D.n,false);
+    if(!$('#ok').checked)return toast('Marca la casilla para continuar');
+    saveDraft();if(!CONFIG.pay)return toast('El pago se activa muy pronto.');location.href=CONFIG.pay};
+  $('#free').onclick=()=>{if(validate())makeLink(3,true)};
+  $('#barBtn').onclick=()=>$('#buy').scrollIntoView({behavior:'smooth'});
+  $('#copy').onclick=async()=>{const i=$('#link');try{await navigator.clipboard.writeText(i.value)}catch(e){i.select();document.execCommand('copy')}toast('Enlace copiado')};
+  document.querySelectorAll('[data-legal]').forEach(b=>b.onclick=e=>{e.preventDefault();$('#legal').showModal()});
+  document.querySelectorAll('[data-c]').forEach(s=>s.textContent=CONFIG[s.dataset.c]);
+  if(thanks){toast('¡Gracias! Ya puedes crear tu enlace.');setTimeout(()=>$('#buy').scrollIntoView({behavior:'smooth'}),500)}
+}
+async function boot(){
+  const m=location.hash.match(/^#c=(.+)/);
+  if(m){try{const D=clean(await dec(m[1]));if(!D.doors.length)throw 0;$('#viewer').hidden=false;document.title=(D.to?D.to+', tienes':'Tienes')+' un regalo';renderCal($('#viewer'),D);return}catch(e){toast('Este enlace está roto o incompleto.')}}
+  initEditor();
+}
+addEventListener('hashchange',()=>location.reload());
+boot();
+</script>
+</body>
+</html>
